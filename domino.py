@@ -1,6 +1,6 @@
 """
 Mask R-CNN
-Train on the toy Dog dataset and implement color splash effect.
+Train on the toy Domino dataset and implement color splash effect.
 
 Copyright (c) 2018 Matterport, Inc.
 Licensed under the MIT License (see LICENSE for details)
@@ -12,19 +12,19 @@ Usage: import the module (see Jupyter notebooks for examples), or run from
        the command line as such:
 
     # Train a new model starting from pre-trained COCO weights
-    python3 dog.py train --dataset=/path/to/dog/dataset --weights=coco
+    python3 domino.py train --dataset=/path/to/domino/dataset --weights=coco
 
     # Resume training a model that you had trained earlier
-    python3 dog.py train --dataset=/path/to/dog/dataset --weights=last
+    python3 domino.py train --dataset=/path/to/domino/dataset --weights=last
 
     # Train a new model starting from ImageNet weights
-    python3 dog.py train --dataset=/path/to/dog/dataset --weights=imagenet
+    python3 domino.py train --dataset=/path/to/domino/dataset --weights=imagenet
 
     # Apply color splash to an image
-    python3 dog.py splash --weights=/path/to/weights/file.h5 --image=<URL or path to file>
+    python3 domino.py splash --weights=/path/to/weights/file.h5 --image=<URL or path to file>
 
     # Apply color splash to video using the last weights you trained
-    python3 dog.py splash --weights=last --video=<URL or path to file>
+    python3 domino.py splash --weights=last --video=<URL or path to file>
 """
 
 import os
@@ -54,19 +54,19 @@ DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
 ############################################################
 
 
-class DogConfig(Config):
+class DominoConfig(Config):
     """Configuration for training on the toy  dataset.
     Derives from the base Config class and overrides some values.
     """
     # Give the configuration a recognizable name
-    NAME = "dog"
+    NAME = "domino"
 
     # We use a GPU with 12GB memory, which can fit two images.
     # Adjust down if you use a smaller GPU.
     IMAGES_PER_GPU = 2
 
     # Number of classes (including background)
-    NUM_CLASSES = 1 + 1  # Background + dog
+    NUM_CLASSES = 1 + 1  # Background + domino
 
     # Number of training steps per epoch
     STEPS_PER_EPOCH = 100
@@ -79,15 +79,15 @@ class DogConfig(Config):
 #  Dataset
 ############################################################
 
-class DogDataset(utils.Dataset):
+class DominoDataset(utils.Dataset):
 
     def load_balloon(self, dataset_dir, subset):
-        """Load a subset of the Dog dataset.
+        """Load a subset of the Domino dataset.
         dataset_dir: Root directory of the dataset.
         subset: Subset to load: train or val
         """
         # Add classes. We have only one class to add.
-        self.add_class("dog", 1, "dog")
+        self.add_class("domino", 1, "domino")
 
         # Train or validation dataset?
         assert subset in ["train", "val"]
@@ -135,7 +135,7 @@ class DogDataset(utils.Dataset):
             height, width = image.shape[:2]
 
             self.add_image(
-                "dog",
+                "domino",
                 image_id=a['filename'],  # use file name as a unique image id
                 path=image_path,
                 width=width, height=height,
@@ -148,9 +148,9 @@ class DogDataset(utils.Dataset):
             one mask per instance.
         class_ids: a 1D array of class IDs of the instance masks.
         """
-        # If not a dog dataset image, delegate to parent class.
+        # If not a domino dataset image, delegate to parent class.
         image_info = self.image_info[image_id]
-        if image_info["source"] != "dog":
+        if image_info["source"] != "domino":
             return super(self.__class__, self).load_mask(image_id)
 
         # Convert polygons to a bitmap mask of shape
@@ -170,7 +170,7 @@ class DogDataset(utils.Dataset):
     def image_reference(self, image_id):
         """Return the path of the image."""
         info = self.image_info[image_id]
-        if info["source"] == "dog":
+        if info["source"] == "domino":
             return info["path"]
         else:
             super(self.__class__, self).image_reference(image_id)
@@ -179,12 +179,12 @@ class DogDataset(utils.Dataset):
 def train(model):
     """Train the model."""
     # Training dataset.
-    dataset_train = DogDataset()
+    dataset_train = DominoDataset()
     dataset_train.load_balloon(args.dataset, "train")
     dataset_train.prepare()
 
     # Validation dataset
-    dataset_val = DogDataset()
+    dataset_val = DominoDataset()
     dataset_val.load_balloon(args.dataset, "val")
     dataset_val.prepare()
 
@@ -293,8 +293,8 @@ if __name__ == '__main__':
                         metavar="<command>",
                         help="'train' or 'splash'")
     parser.add_argument('--dataset', required=False,
-                        metavar="/path/to/dog/dataset/",
-                        help='Directory of the Dog dataset')
+                        metavar="/path/to/domino/dataset/",
+                        help='Directory of the Domino dataset')
     parser.add_argument('--weights', required=True,
                         metavar="/path/to/weights.h5",
                         help="Path to weights .h5 file or 'coco'")
@@ -323,9 +323,9 @@ if __name__ == '__main__':
 
     # Configurations
     if args.command == "train":
-        config = DogConfig()
+        config = DominoConfig()
     else:
-        class InferenceConfig(DogConfig):
+        class InferenceConfig(DominoConfig):
             # Set batch size to 1 since we'll be running inference on
             # one image at a time. Batch size = GPU_COUNT * IMAGES_PER_GPU
             GPU_COUNT = 1
