@@ -81,7 +81,7 @@ class DominoConfig(Config):
 
 class DominoDataset(utils.Dataset):
 
-    def load_balloon(self, dataset_dir, subset):
+    def load_domino(self, dataset_dir, subset):
         """Load a subset of the Domino dataset.
         dataset_dir: Root directory of the dataset.
         subset: Subset to load: train or val
@@ -180,12 +180,12 @@ def train(model):
     """Train the model."""
     # Training dataset.
     dataset_train = DominoDataset()
-    dataset_train.load_balloon(args.dataset, "train")
+    dataset_train.load_domino(args.dataset, "train")
     dataset_train.prepare()
 
     # Validation dataset
     dataset_val = DominoDataset()
-    dataset_val.load_balloon(args.dataset, "val")
+    dataset_val.load_domino(args.dataset, "val")
     dataset_val.prepare()
 
     # *** This training schedule is an example. Update to your needs ***
@@ -288,7 +288,7 @@ if __name__ == '__main__':
 
     # Parse command line arguments
     parser = argparse.ArgumentParser(
-        description='Train Mask R-CNN to detect balloons.')
+        description='Train Mask R-CNN to detect dominos.')
     parser.add_argument("command",
                         metavar="<command>",
                         help="'train' or 'splash'")
