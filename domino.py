@@ -26,7 +26,7 @@ Usage: import the module (see Jupyter notebooks for examples), or run from
     # Apply color splash to video using the last weights you trained
     python3 domino.py splash --weights=last --video=<URL or path to file>
 """
-
+from imgaug import augmenters as iaa
 import os
 import sys
 import json
@@ -192,10 +192,22 @@ def train(model):
     # Since we're using a very small dataset, and starting from
     # COCO trained weights, we don't need to train too long. Also,
     # no need to train all layers, just the heads should do it.
+
+    max_augs = 3
+    augmentation = iaa.SomeOf((0, max_augs), [
+        iaa.Fliplr(0.5),
+        iaa.Flipud(0.5),
+        iaa.OneOf([iaa.Affine(rotate=30 * i) for i in range(0, 12)]),
+        iaa.Affine(scale={"x": (0.8, 1.2), "y": (0.8, 1.2)}),
+        iaa.Add((-40, 40)),
+        iaa.Multiply((0.8, 1.5)),
+        iaa.GaussianBlur(sigma=(0.0, 5.0))
+    ])
     print("Training network heads")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
                 epochs=10,
+                augmentation=augumentation,
                 layers='heads')
 
     # Root directory of the project
