@@ -49,7 +49,7 @@ def copiar_imagens(imagens, path_destination):
                 "linha": linha
             }
             linhas_csv.append(linha)
-
+    imagens_csv = linhas_csv[0]['linha']
     for image in imagens:
         path_destination_aux = path_destination + "\\" + image
         path = DATADIR + "\\" + image
@@ -58,9 +58,9 @@ def copiar_imagens(imagens, path_destination):
         for line in linhas_csv:
             if image == line['nome']:
                 if "\n" in line["linha"]:
-                    imagens_csv = line["linha"] + imagens_csv
+                    imagens_csv = imagens_csv + line["linha"]
                 else:
-                    imagens_csv = line["linha"] + "\n" + imagens_csv
+                    imagens_csv = imagens_csv + line["linha"] + "\n"
 
     imagens_csv = imagens_csv + "\n"
     f = open(path_destination + "\\" + "annotation.csv", "w")
