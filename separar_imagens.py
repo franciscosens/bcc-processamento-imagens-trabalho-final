@@ -9,7 +9,7 @@ except ImportError:
 
 DATADIR = "C:\\Users\\franc\\Desktop\\deep-learning\\my-deep-learning-second-project\\dataset"
 DATADIR_TRAIN = DATADIR + "\\train"
-DATADIR_VAL = DATADIR + "\\test"
+DATADIR_VAL = DATADIR + "\\val"
 
 
 def separar_imagens():
