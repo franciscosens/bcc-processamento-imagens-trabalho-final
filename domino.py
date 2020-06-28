@@ -59,7 +59,7 @@ class DominoConfig(Config):
     Derives from the base Config class and overrides some values.
     """
     # Give the configuration a recognizable name
-    NAME = "domino"
+    NAME = "dom"
 
     # We use a GPU with 12GB memory, which can fit two images.
     # Adjust down if you use a smaller GPU.
@@ -87,7 +87,7 @@ class DominoDataset(utils.Dataset):
         subset: Subset to load: train or val
         """
         # Add classes. We have only one class to add.
-        self.add_class("domino", 1, "domino")
+        self.add_class("dom", 1, "domino")
 
         # Train or validation dataset?
         assert subset in ["train", "val"]
@@ -135,7 +135,7 @@ class DominoDataset(utils.Dataset):
             height, width = image.shape[:2]
 
             self.add_image(
-                "domino",
+                "dom",
                 image_id=a['filename'],  # use file name as a unique image id
                 path=image_path,
                 width=width, height=height,
@@ -150,7 +150,7 @@ class DominoDataset(utils.Dataset):
         """
         # If not a domino dataset image, delegate to parent class.
         image_info = self.image_info[image_id]
-        if image_info["source"] != "domino":
+        if image_info["source"] != "dom":
             return super(self.__class__, self).load_mask(image_id)
 
         # Convert polygons to a bitmap mask of shape
@@ -170,7 +170,7 @@ class DominoDataset(utils.Dataset):
     def image_reference(self, image_id):
         """Return the path of the image."""
         info = self.image_info[image_id]
-        if info["source"] == "domino":
+        if info["source"] == "dom":
             return info["path"]
         else:
             super(self.__class__, self).image_reference(image_id)
@@ -203,12 +203,31 @@ def train(model):
         iaa.Multiply((0.8, 1.5)),
         iaa.GaussianBlur(sigma=(0.0, 5.0))
     ])
+    # print("Training network heads")
+    # model.train(dataset_train, dataset_val,
+    #             learning_rate=config.LEARNING_RATE,
+    #             epochs=10,
+    #             augmentation=augmentation,
+    #             layers='heads')
+    #
     print("Training network heads")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=10,
-                augmentation=augumentation,
+                epochs=5,
+                #augmentation=augmentation,
                 layers='heads')
+    print("Training network layers")
+    model.train(dataset_train, dataset_val,
+                learning_rate=config.LEARNING_RATE,
+                epochs=10,
+                #augmentation=augmentation,
+                layers='4+')
+    print("Training network All")
+    model.train(dataset_train, dataset_val,
+                learning_rate=config.LEARNING_RATE,
+                epochs=20,
+                #augmentation=augmentation,
+                layers='all')
 
     # Root directory of the project
     ROOT_DIR = os.getcwd()
